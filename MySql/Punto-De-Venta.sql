@@ -11,6 +11,12 @@ CREATE TABLE usuarios (
     fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Registros
+INSERT INTO usuarios (nombre, correo, contrasena, rol) VALUES
+('Juan Pérez', 'juan.perez@example.com', 'contrasena123', 'cajero'),
+('Ana García', 'ana.garcia@example.com', 'contrasena456', 'cajero');
+
+
 -- Tabla de productos (no necesita cambios)
 CREATE TABLE productos (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -22,6 +28,16 @@ CREATE TABLE productos (
     codigo_barras VARCHAR(50) UNIQUE,
     fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- Registros
+INSERT INTO productos (nombre, descripcion, precio, cantidad_en_stock, categoria, codigo_barras) VALUES
+('Taco de Carne Asada', 'Taco con carne asada, cebolla y cilantro', 2.50, 50, 'Tacos', '0012345678910'),
+('Taco de Pollo', 'Taco con pollo deshebrado y salsa verde', 2.00, 40, 'Tacos', '0012345678911'),
+('Taco de Pescado', 'Taco con pescado empanizado y ensalada de col', 2.80, 30, 'Tacos', '0012345678912'),
+('Taco Veggie', 'Taco con verduras asadas y guacamole', 2.20, 20, 'Tacos', '0012345678913'),
+('Taco de Barbacoa', 'Taco con barbacoa de res y salsa roja', 3.00, 25, 'Tacos', '0012345678914'),
+('Taco de Chicharrón Prensado', 'Taco con chicharrón prensado y salsa', 2.50, 35, 'Tacos', '0012345678915');
+
 
 -- Tabla de clientes (no necesita cambios)
 CREATE TABLE clientes (
