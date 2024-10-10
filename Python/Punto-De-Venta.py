@@ -2,6 +2,8 @@ import tkinter as tk
 from tkinter import messagebox
 import mysql.connector
 from mysql.connector import Error
+from tkinter import PhotoImage
+import datetime
 
 # Conexión a la base de datos
 def conectar():
@@ -53,9 +55,51 @@ def registrar_venta(id_usuario, id_cliente, productos):
                 cursor.execute(query_inventario, (cantidad, id_producto))
 
             connection.commit()
+            generar_ticket(id_venta, id_usuario, productos, total)
             messagebox.showinfo("Éxito", f"Venta registrada con éxito. Total: ${total:.2f}")
     except Error as e:
         messagebox.showerror("Error", f"Error al registrar la venta: {e}")
+    finally:
+        if connection and connection.is_connected():
+            cursor.close()
+            connection.close()
+
+# Generar ticket y guardarlo en un archivo de texto
+def generar_ticket(id_venta, id_usuario, productos, total):
+    try:
+        connection = conectar()
+        if connection:
+            cursor = connection.cursor()
+
+            # Obtener detalles del usuario
+            cursor.execute("SELECT nombre FROM usuarios WHERE id = %s", (id_usuario,))
+            cajero = cursor.fetchone()[0]
+
+            # Formatear ticket
+            ticket = "*" * 30 + "\n"
+            ticket += " Taqueria Los Dos Plebes \n"
+            ticket += f" Fecha y Hora: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')} \n"
+            ticket += f" Número de Ticket: {id_venta} \n"
+            ticket += f" Cajero: {cajero} \n"
+            ticket += "*" * 30 + "\n"
+            ticket += " Productos Vendidos: \n"
+            for id_producto, cantidad in productos:
+                cursor.execute("SELECT nombre, precio FROM productos WHERE id = %s", (id_producto,))
+                nombre_producto, precio = cursor.fetchone()
+                ticket += f" {nombre_producto} - Cantidad: {cantidad} - Precio: ${precio:.2f} \n"
+            ticket += "*" * 30 + "\n"
+            ticket += f" Total a Pagar: ${total:.2f} \n"
+            ticket += "*" * 30 + "\n"
+
+            # Guardar el ticket en un archivo de texto
+            with open(f'ticket_{id_venta}.txt', 'w') as file:
+                file.write(ticket)
+
+            # Notificar al usuario que se ha guardado el ticket
+            messagebox.showinfo("Ticket Guardado", f"El ticket ha sido guardado como ticket_{id_venta}.txt")
+
+    except Error as e:
+        messagebox.showerror("Error", f"Error al generar el ticket: {e}")
     finally:
         if connection and connection.is_connected():
             cursor.close()
@@ -113,14 +157,7 @@ def generar_corte_z():
                 report += f"ID Venta: {venta[0]}, Fecha: {venta[1]}, Cajero: {venta[2]}, Total: ${venta[3]:.2f}\n"
                 total_dia += venta[3]
             report += f"Total vendido en el día (Corte Z): ${total_dia:.2f}\n"
-
-            # Aquí puedes agregar código para marcar el final del día, reiniciar totales, etc.
-            # Por ejemplo, insertar un registro de cierre en una tabla de "cierres de caja".
             messagebox.showinfo("Corte Z", report)
-
-            # Código adicional para reiniciar totales puede ir aquí.
-            # Por ejemplo: cursor.execute("INSERT INTO cierres_caja (fecha, total) VALUES (CURDATE(), %s)", (total_dia,))
-            # connection.commit()
 
     except Error as e:
         messagebox.showerror("Error", f"Error al generar el corte Z: {e}")
@@ -133,19 +170,19 @@ def generar_corte_z():
 def abrir_registrar_venta():
     ventana_venta = tk.Toplevel(root)
     ventana_venta.title("Registrar Venta")
-    ventana_venta.configure(bg='#f2f2f2')
+    ventana_venta.configure(bg='#f0f8ff')
 
-    tk.Label(ventana_venta, text="ID del Cajero:", bg='#f2f2f2').pack(pady=5)
-    id_usuario_entry = tk.Entry(ventana_venta)
+    tk.Label(ventana_venta, text="ID del Cajero:", bg='#f0f8ff', font=("Arial", 12)).pack(pady=5)
+    id_usuario_entry = tk.Entry(ventana_venta, font=("Arial", 12), bd=2, relief="groove")
     id_usuario_entry.pack(pady=5)
 
-    tk.Label(ventana_venta, text="ID del Cliente (dejar vacío si es cliente general):", bg='#f2f2f2').pack(pady=5)
-    id_cliente_entry = tk.Entry(ventana_venta)
+    tk.Label(ventana_venta, text="ID del Cliente (dejar vacío si es cliente general):", bg='#f0f8ff', font=("Arial", 12)).pack(pady=5)
+    id_cliente_entry = tk.Entry(ventana_venta, font=("Arial", 12), bd=2, relief="groove")
     id_cliente_entry.pack(pady=5)
 
-    productos_entry = tk.Text(ventana_venta, height=5, width=40)
+    productos_entry = tk.Text(ventana_venta, height=5, width=40, font=("Arial", 12), bd=2, relief="groove")
     productos_entry.pack(pady=10)
-    tk.Label(ventana_venta, text="Ingrese los productos en el formato 'ID, Cantidad' por línea:", bg='#f2f2f2').pack(pady=5)
+    tk.Label(ventana_venta, text="Ingrese los productos en el formato 'ID, Cantidad' por línea:", bg='#f0f8ff', font=("Arial", 12)).pack(pady=5)
 
     def registrar_venta_gui():
         id_usuario = id_usuario_entry.get()
@@ -160,33 +197,30 @@ def abrir_registrar_venta():
         registrar_venta(int(id_usuario), id_cliente, productos)
         ventana_venta.destroy()
 
-    tk.Button(ventana_venta, text="Registrar Venta", command=registrar_venta_gui, bg='#4CAF50', fg='white').pack(pady=10)
+    tk.Button(ventana_venta, text="Registrar Venta", command=registrar_venta_gui, bg='#4CAF50', fg='white', font=("Arial", 12), relief="raised", width=20).pack(pady=10)
 
 # Configuración de la ventana principal
 root = tk.Tk()
 root.title("Sistema de Punto de Venta")
 
 # Estilo
-root.configure(bg='#f2f2f2')
+root.configure(bg='#f0f8ff')
 header = tk.Label(root, text="Sistema de Punto de Venta", font=("Arial", 24, "bold"), bg='#4CAF50', fg='white')
-header.pack(pady=10, fill=tk.X)
+header.pack(pady=20)
 
-# Frame para los botones
-frame = tk.Frame(root, bg='#f2f2f2')
-frame.pack(pady=20)
+# Logo
+logo = PhotoImage(file="logo.png")
+logo = logo.subsample(4, 4)  # Reducir el tamaño del logo
+logo_label = tk.Label(root, image=logo, bg='#f0f8ff')
+logo_label.pack(pady=10)
 
-# Botones del menú
-btn_registrar_venta = tk.Button(frame, text="Registrar Venta", command=abrir_registrar_venta, bg='#4CAF50', fg='white', font=("Arial", 14), width=20)
-btn_registrar_venta.pack(pady=10)
+# Botones de opciones
+tk.Button(root, text="Registrar Venta", command=abrir_registrar_venta, bg='#4CAF50', fg='white', font=("Arial", 12), relief="raised", width=20).pack(pady=10)
+tk.Button(root, text="Generar Corte X", command=generar_corte_x, bg='#2196F3', fg='white', font=("Arial", 12), relief="raised", width=20).pack(pady=10)
+tk.Button(root, text="Generar Corte Z", command=generar_corte_z, bg='#F44336', fg='white', font=("Arial", 12), relief="raised", width=20).pack(pady=10)
 
-btn_corte_x = tk.Button(frame, text="Generar Corte X", command=generar_corte_x, bg='#2196F3', fg='white', font=("Arial", 14), width=20)
-btn_corte_x.pack(pady=10)
+# Botón de salir
+tk.Button(root, text="Salir", command=root.quit, bg='#FF5733', fg='white', font=("Arial", 12), relief="raised", width=20).pack(pady=10)
 
-btn_corte_z = tk.Button(frame, text="Generar Corte Z", command=generar_corte_z, bg='#FF9800', fg='white', font=("Arial", 14), width=20)
-btn_corte_z.pack(pady=10)
-
-btn_salir = tk.Button(frame, text="Salir", command=root.quit, bg='#f44336', fg='white', font=("Arial", 14), width=20)
-btn_salir.pack(pady=10)
-
-# Ejecutar la interfaz gráfica
+# Iniciar la ventana principal
 root.mainloop()
