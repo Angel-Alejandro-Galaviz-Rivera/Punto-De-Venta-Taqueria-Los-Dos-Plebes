@@ -3,6 +3,7 @@ from tkinter import messagebox
 import mysql.connector
 from mysql.connector import Error
 from tkinter import PhotoImage
+from PIL import Image, ImageTk  # Este sirve para modificar la imagen de fondo
 import datetime
 
 # Conexión a la base de datos
@@ -197,30 +198,24 @@ def abrir_registrar_venta():
         registrar_venta(int(id_usuario), id_cliente, productos)
         ventana_venta.destroy()
 
-    tk.Button(ventana_venta, text="Registrar Venta", command=registrar_venta_gui, bg='#4CAF50', fg='white', font=("Arial", 12), relief="raised", width=20).pack(pady=10)
+    tk.Button(ventana_venta, text="Registrar Venta", command=registrar_venta_gui, bg='#FFD700', fg='black', font=("Arial", 12), relief="raised", width=20).pack(pady=10)
 
 # Configuración de la ventana principal
 root = tk.Tk()
 root.title("Sistema de Punto de Venta")
 
-# Estilo
-root.configure(bg='#f0f8ff')
-header = tk.Label(root, text="Sistema de Punto de Venta", font=("Arial", 24, "bold"), bg='#4CAF50', fg='white')
-header.pack(pady=20)
+# Imagen d fondo
+imagen_fondo = Image.open("Fondo Blanco.jpg")
+imagen_fondo = imagen_fondo.resize((1600, 1050), Image.Resampling.LANCZOS)  
+fondo = ImageTk.PhotoImage(imagen_fondo)
 
-# Logo
-logo = PhotoImage(file="logo.png")
-logo = logo.subsample(4, 4)  # Reducir el tamaño del logo
-logo_label = tk.Label(root, image=logo, bg='#f0f8ff')
-logo_label.pack(pady=10)
+fondo_label = tk.Label(root, image=fondo)
+fondo_label.place(x=0, y=0)
 
-# Botones de opciones
-tk.Button(root, text="Registrar Venta", command=abrir_registrar_venta, bg='#4CAF50', fg='white', font=("Arial", 12), relief="raised", width=20).pack(pady=10)
-tk.Button(root, text="Generar Corte X", command=generar_corte_x, bg='#2196F3', fg='white', font=("Arial", 12), relief="raised", width=20).pack(pady=10)
-tk.Button(root, text="Generar Corte Z", command=generar_corte_z, bg='#F44336', fg='white', font=("Arial", 12), relief="raised", width=20).pack(pady=10)
+# Botones
+tk.Button(root, text="Registrar Venta", command=abrir_registrar_venta, bg='#FFD700', fg='black', font=("Arial", 12), relief="raised", width=20).pack(pady=20)
+tk.Button(root, text="Generar Corte X", command=generar_corte_x, bg='#FFD700', fg='black', font=("Arial", 12), relief="raised", width=20).pack(pady=20)
+tk.Button(root, text="Generar Corte Z", command=generar_corte_z, bg='#FFD700', fg='black', font=("Arial", 12), relief="raised", width=20).pack(pady=20)
 
-# Botón de salir
-tk.Button(root, text="Salir", command=root.quit, bg='#FF5733', fg='white', font=("Arial", 12), relief="raised", width=20).pack(pady=10)
-
-# Iniciar la ventana principal
+root.geometry("1600x1050")
 root.mainloop()
