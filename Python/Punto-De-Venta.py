@@ -204,27 +204,24 @@ def abrir_registrar_venta():
 root = tk.Tk()
 root.title("Sistema de Punto de Venta")
 
-# Imagen d fondo
+# Imagen de fondo
 imagen_fondo = Image.open("Fondo Blanco.jpg")
-imagen_fondo = imagen_fondo.resize((1600, 1050), Image.Resampling.LANCZOS)  
-fondo = ImageTk.PhotoImage(imagen_fondo)
-
-fondo_label = tk.Label(root, image=fondo)
-fondo_label.place(x=0, y=0)
+imagen_fondo = imagen_fondo.resize((1600, 1050), Image.LANCZOS)
+imagen_fondo_tk = ImageTk.PhotoImage(imagen_fondo)
+fondo_label = tk.Label(root, image=imagen_fondo_tk)
+fondo_label.place(x=0, y=0, relwidth=1, relheight=1)
 
 # Logo
-logo = PhotoImage(file="logo.png")
-logo = logo.subsample(4, 4)  # Reducir el tamaño del logo
-logo_label = tk.Label(root, image=logo, bg='#f0f8ff')
-logo_label.pack(pady=10)
-fondo_label = tk.Label(root, image=fondo)
-fondo_label.place(x=0, y=0)
+logo_img = Image.open("logo.png")
+logo_img = logo_img.resize((200, 200), Image.LANCZOS)
+logo_tk = ImageTk.PhotoImage(logo_img)
+logo_label = tk.Label(root, image=logo_tk, bg="#FFFFFF")
+logo_label.place(x=670, y=255)
 
 
-# Botones
-tk.Button(root, text="Registrar Venta", command=abrir_registrar_venta, bg='#FFD700', fg='black', font=("Arial", 12), relief="raised", width=20).pack(pady=20)
-tk.Button(root, text="Generar Corte X", command=generar_corte_x, bg='#FFD700', fg='black', font=("Arial", 12), relief="raised", width=20).pack(pady=20)
-tk.Button(root, text="Generar Corte Z", command=generar_corte_z, bg='#FFD700', fg='black', font=("Arial", 12), relief="raised", width=20).pack(pady=20)
+# Botones principales
+tk.Button(root, text="Registrar Venta", command=abrir_registrar_venta, bg='#FFD700', fg='black', font=("Arial", 16), relief="raised", width=20).pack(pady=10)
+tk.Button(root, text="Corte X", command=generar_corte_x, bg='#FFD700', fg='black', font=("Arial", 16), relief="raised", width=20).pack(pady=10)
+tk.Button(root, text="Corte Z", command=generar_corte_z, bg='#FFD700', fg='black', font=("Arial", 16), relief="raised", width=20).pack(pady=10)
 
-root.geometry("1600x1050")
 root.mainloop()
