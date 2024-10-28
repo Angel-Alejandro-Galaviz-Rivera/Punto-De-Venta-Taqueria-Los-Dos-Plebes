@@ -212,6 +212,15 @@ fondo = ImageTk.PhotoImage(imagen_fondo)
 fondo_label = tk.Label(root, image=fondo)
 fondo_label.place(x=0, y=0)
 
+# Logo
+logo = PhotoImage(file="logo.png")
+logo = logo.subsample(4, 4)  # Reducir el tamaño del logo
+logo_label = tk.Label(root, image=logo, bg='#f0f8ff')
+logo_label.pack(pady=10)
+fondo_label = tk.Label(root, image=fondo)
+fondo_label.place(x=0, y=0)
+
+
 # Botones
 tk.Button(root, text="Registrar Venta", command=abrir_registrar_venta, bg='#FFD700', fg='black', font=("Arial", 12), relief="raised", width=20).pack(pady=20)
 tk.Button(root, text="Generar Corte X", command=generar_corte_x, bg='#FFD700', fg='black', font=("Arial", 12), relief="raised", width=20).pack(pady=20)
