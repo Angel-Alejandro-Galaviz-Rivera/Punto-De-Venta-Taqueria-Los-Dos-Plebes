@@ -76,13 +76,38 @@ CREATE TABLE cortes_z (
 );
 
 -- Registros de productos
-INSERT INTO productos (nombre, descripcion, precio, cantidad_en_stock, categoria, codigo_barras) VALUES
-('Taco de Carne Asada', 'Taco con carne asada, cebolla y cilantro', 2.50, 50, 'Tacos', '0012345678910'),
-('Taco de Pollo', 'Taco con pollo deshebrado y salsa verde', 2.00, 40, 'Tacos', '0012345678911'),
-('Taco de Pescado', 'Taco con pescado empanizado y ensalada de col', 2.80, 30, 'Tacos', '0012345678912'),
-('Taco Veggie', 'Taco con verduras asadas y guacamole', 2.20, 20, 'Tacos', '0012345678913'),
-('Taco de Barbacoa', 'Taco con barbacoa de res y salsa roja', 3.00, 25, 'Tacos', '0012345678914'),
-('Taco de Chicharrón Prensado', 'Taco con chicharrón prensado y salsa', 2.50, 35, 'Tacos', '0012345678915');
+INSERT INTO productos (nombre, descripcion, precio, cantidad_en_stock, categoria, codigo_barras) VALUES 
+('Taco de sirloin maíz', 'Taco de sirloin con tortilla maíz', 26, 23, 'tacos', '000001'),
+('Taco de sirloin harina', 'Taco de sirloin con tortilla de harina', 26, 15, 'tacos', '000002'),
+('Taco sirloin maíz con queso', 'Taco de sirloin con tortilla de maíz y queso', 32, 35, 'tacos', '000003'),
+('Taco de sirloin harina con queso', 'Taco de sirloin con tortilla de harina y queso', 32, 12, 'tacos', '000004'),
+('Quesadilla mixta de harina', 'Quesadilla con carne sirloin y trompo', 65, 9, 'quesadillas', '000005'),
+('Quesadilla Maíz', 'Tortilla grande con queso y carne', 65, 31, 'quesadillas', '000006'),
+('Vampiro', 'Tortilla tostada a las brasas con queso y carne', 50, 17, 'antojitos', '000007'),
+('Pellizcada', 'Sope con asientos de puerco, queso y carne', 70, 6, 'antojitos', '000008'),
+('Papa Asada especial', 'Con carne, acompañada de tortilla o galleta', 125, 25, 'papas', '000009'),
+('Papa sencilla', 'Sin carne, acompañada de tortilla o galleta', 80, 7, 'papas', '000010'),
+('Salchicha asada sencilla', 'Salchicha asada', 30, 19, 'salchichas', '000011'),
+('Salchicha asada especial', 'Con queso y carne', 45, 4, 'salchichas', '000012'),
+('Frijoles charros sencillos', 'Frijoles charros', 30, 33, 'frijoles', '000013'),
+('Frijoles charros especiales', NULL, 40, 8, 'frijoles', '000014'),
+
+-- Bebidas de 1 litro
+('Litro Horchata', NULL, 50, 20, 'bebidas', '000015'),
+('Litro Cebada', NULL, 50, 18, 'bebidas', '000016'),
+('Litro Limón', NULL, 50, 15, 'bebidas', '000017'),
+('Litro Jamaica', NULL, 50, 25, 'bebidas', '000018'),
+('Litro Piña', NULL, 50, 19, 'bebidas', '000019'),
+
+-- Bebidas de 600 ml
+('600 ml Horchata', NULL, 30, 10, 'bebidas', '000020'),
+('600 ml Cebada', NULL, 30, 12, 'bebidas', '000021'),
+('600 ml Limón', NULL, 30, 8, 'bebidas', '000022'),
+('600 ml Jamaica', NULL, 30, 15, 'bebidas', '000023'),
+('600 ml Piña', NULL, 30, 11, 'bebidas', '000024'),
+
+('Refresco', NULL, 30, 28, 'bebidas', '000025'),
+('Agua natural', NULL, 20, 37, 'bebidas', '000026');
 
 -- Registros de usuarios
 INSERT INTO usuarios (nombre, correo, contrasena, rol) VALUES
