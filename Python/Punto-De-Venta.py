@@ -5,6 +5,9 @@ from mysql.connector import Error
 from tkinter import PhotoImage
 import datetime
 
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
+
 # Conexión a la base de datos
 def conectar():
     try:    
@@ -19,6 +22,87 @@ def conectar():
     except Error as e:
         messagebox.showerror("Error", f"Error al conectar a la base de datos: {e}")
         return None
+import tkinter as tk
+from tkinter import messagebox
+from mysql.connector import Error
+import datetime
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import letter
+
+# Ventana para registrar ventas
+def abrir_registrar_venta():
+    ventana_venta = tk.Toplevel(root)
+    ventana_venta.title("Registrar Venta")
+    ventana_venta.configure(bg='#f0f8ff')
+
+    tk.Label(ventana_venta, text="ID del Cajero:", bg='#f0f8ff', font=("Arial", 12)).pack(pady=5)
+    id_usuario_entry = tk.Entry(ventana_venta, font=("Arial", 12), bd=2, relief="groove")
+    id_usuario_entry.pack(pady=5)
+
+    tk.Label(ventana_venta, text="ID del Cliente (dejar vacío si es cliente general):", bg='#f0f8ff', font=("Arial", 12)).pack(pady=5)
+    id_cliente_entry = tk.Entry(ventana_venta, font=("Arial", 12), bd=2, relief="groove")
+    id_cliente_entry.pack(pady=5)
+
+    # Listbox para seleccionar productos
+    tk.Label(ventana_venta, text="Seleccione los productos:", bg='#f0f8ff', font=("Arial", 12)).pack(pady=5)
+    productos_listbox = tk.Listbox(ventana_venta, height=10, width=50, font=("Arial", 12), bd=2, relief="groove", selectmode=tk.MULTIPLE)
+    productos_listbox.pack(pady=10)
+
+    # Llenar el Listbox con productos de la base de datos
+    try:
+        connection = conectar()
+        if connection:
+            cursor = connection.cursor()
+            cursor.execute("SELECT id, nombre FROM productos")
+            productos = cursor.fetchall()
+            for producto in productos:
+                productos_listbox.insert(tk.END, f"{producto[0]} - {producto[1]}")
+    except Error as e:
+        messagebox.showerror("Error", f"Error al cargar productos: {e}")
+    finally:
+        if connection and connection.is_connected():
+            cursor.close()
+            connection.close()
+
+    tk.Label(ventana_venta, text="Ingrese la cantidad para cada producto (separados por comas):", bg='#f0f8ff', font=("Arial", 12)).pack(pady=5)
+    cantidades_entry = tk.Entry(ventana_venta, font=("Arial", 12), bd=2, relief="groove")
+    cantidades_entry.pack(pady=5)
+
+    def registrar_venta_gui():
+        id_usuario = id_usuario_entry.get()
+        id_cliente = id_cliente_entry.get() or None
+        
+        # Obtener productos seleccionados
+        productos_seleccionados = productos_listbox.curselection()
+        productos = []
+
+        # Verificar que se han seleccionado productos
+        if not productos_seleccionados:
+            messagebox.showwarning("Advertencia", "Debe seleccionar al menos un producto.")
+            return
+        
+        # Obtener cantidades
+        cantidades = cantidades_entry.get().split(",")
+        if len(cantidades) != len(productos_seleccionados):
+            messagebox.showwarning("Advertencia", "El número de cantidades debe coincidir con el número de productos seleccionados.")
+            return
+
+        for index in productos_seleccionados:
+            # Obtener el ID del producto seleccionado
+            producto_info = productos_listbox.get(index)
+            id_producto = int(producto_info.split(" - ")[0])  # Obtener solo el ID
+            try:
+                cantidad = int(cantidades[index].strip())  # Obtener la cantidad correspondiente
+                productos.append((id_producto, cantidad))
+            except ValueError:
+                messagebox.showwarning("Advertencia", f"La cantidad para el producto '{producto_info}' no es válida.")
+                return
+
+        registrar_venta(int(id_usuario), id_cliente, productos)
+        ventana_venta.destroy()
+
+    tk.Button(ventana_venta, text="Registrar Venta", command=registrar_venta_gui, bg='#4CAF50', fg='white', font=("Arial", 12), relief="raised", width=20).pack(pady=10)
+
 
 # Registrar una venta
 def registrar_venta(id_usuario, id_cliente, productos):
@@ -64,7 +148,7 @@ def registrar_venta(id_usuario, id_cliente, productos):
             cursor.close()
             connection.close()
 
-# Generar ticket y guardarlo en un archivo de texto
+# Generar ticket y guardarlo en un archivo PDF
 def generar_ticket(id_venta, id_usuario, productos, total):
     try:
         connection = conectar()
@@ -75,28 +159,31 @@ def generar_ticket(id_venta, id_usuario, productos, total):
             cursor.execute("SELECT nombre FROM usuarios WHERE id = %s", (id_usuario,))
             cajero = cursor.fetchone()[0]
 
-            # Formatear ticket
-            ticket = "*" * 30 + "\n"
-            ticket += " Taqueria Los Dos Plebes \n"
-            ticket += f" Fecha y Hora: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')} \n"
-            ticket += f" Número de Ticket: {id_venta} \n"
-            ticket += f" Cajero: {cajero} \n"
-            ticket += "*" * 30 + "\n"
-            ticket += " Productos Vendidos: \n"
+            # Crear el archivo PDF
+            pdf_file_name = f'ticket_{id_venta}.pdf'
+            c = canvas.Canvas(pdf_file_name, pagesize=letter)
+            width, height = letter
+
+            # Formatear ticket en PDF
+            c.drawString(100, height - 50, "Taqueria Los Dos Plebes")
+            c.drawString(100, height - 80, f"Fecha y Hora: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+            c.drawString(100, height - 100, f"Número de Ticket: {id_venta}")
+            c.drawString(100, height - 120, f"Cajero: {cajero}")
+            c.drawString(100, height - 150, "Productos Vendidos:")
+
+            # Añadir productos al PDF
+            y_position = height - 180
             for id_producto, cantidad in productos:
                 cursor.execute("SELECT nombre, precio FROM productos WHERE id = %s", (id_producto,))
                 nombre_producto, precio = cursor.fetchone()
-                ticket += f" {nombre_producto} - Cantidad: {cantidad} - Precio: ${precio:.2f} \n"
-            ticket += "*" * 30 + "\n"
-            ticket += f" Total a Pagar: ${total:.2f} \n"
-            ticket += "*" * 30 + "\n"
+                c.drawString(100, y_position, f"{nombre_producto} - Cantidad: {cantidad} - Precio: ${precio:.2f}")
+                y_position -= 20  # Espacio entre líneas
 
-            # Guardar el ticket en un archivo de texto
-            with open(f'ticket_{id_venta}.txt', 'w') as file:
-                file.write(ticket)
+            c.drawString(100, y_position, f"Total a Pagar: ${total:.2f}")
+            c.save()  # Guardar el PDF
 
             # Notificar al usuario que se ha guardado el ticket
-            messagebox.showinfo("Ticket Guardado", f"El ticket ha sido guardado como ticket_{id_venta}.txt")
+            messagebox.showinfo("Ticket Guardado", f"El ticket ha sido guardado como {pdf_file_name}")
 
     except Error as e:
         messagebox.showerror("Error", f"Error al generar el ticket: {e}")
@@ -166,42 +253,50 @@ def generar_corte_z():
             cursor.close()
             connection.close()
 
-# Ventana para registrar ventas
-def abrir_registrar_venta():
-    ventana_venta = tk.Toplevel(root)
-    ventana_venta.title("Registrar Venta")
-    ventana_venta.configure(bg='#f0f8ff')
+# Consultar el inventario
+def consultar_inventario():
+    try:
+        connection = conectar()
+        if connection:
+            cursor = connection.cursor()
 
-    tk.Label(ventana_venta, text="ID del Cajero:", bg='#f0f8ff', font=("Arial", 12)).pack(pady=5)
-    id_usuario_entry = tk.Entry(ventana_venta, font=("Arial", 12), bd=2, relief="groove")
-    id_usuario_entry.pack(pady=5)
+            # Obtener todos los productos y sus cantidades en stock
+            cursor.execute("SELECT nombre, cantidad_en_stock FROM productos")
+            inventario = cursor.fetchall()
 
-    tk.Label(ventana_venta, text="ID del Cliente (dejar vacío si es cliente general):", bg='#f0f8ff', font=("Arial", 12)).pack(pady=5)
-    id_cliente_entry = tk.Entry(ventana_venta, font=("Arial", 12), bd=2, relief="groove")
-    id_cliente_entry.pack(pady=5)
+            # Crear una nueva ventana para mostrar el inventario
+            ventana_inventario = tk.Toplevel(root)
+            ventana_inventario.title("Consultar Inventario")
+            ventana_inventario.configure(bg='#f0f8ff')
 
-    productos_entry = tk.Text(ventana_venta, height=5, width=40, font=("Arial", 12), bd=2, relief="groove")
-    productos_entry.pack(pady=10)
-    tk.Label(ventana_venta, text="Ingrese los productos en el formato 'ID, Cantidad' por línea:", bg='#f0f8ff', font=("Arial", 12)).pack(pady=5)
+            # Crear una etiqueta para el título
+            tk.Label(ventana_inventario, text="Inventario Actual", font=("Arial", 16, "bold"), bg='#f0f8ff').pack(pady=10)
 
-    def registrar_venta_gui():
-        id_usuario = id_usuario_entry.get()
-        id_cliente = id_cliente_entry.get() or None
-        productos = []
-        
-        for line in productos_entry.get("1.0", tk.END).strip().splitlines():
-            if line:
-                id_producto, cantidad = map(int, line.split(","))
-                productos.append((id_producto, cantidad))
+            # Mostrar el inventario en un Text widget
+            inventario_text = tk.Text(ventana_inventario, height=15, width=50, font=("Arial", 12), bd=2, relief="groove")
+            inventario_text.pack(pady=10)
 
-        registrar_venta(int(id_usuario), id_cliente, productos)
-        ventana_venta.destroy()
+            # Agregar los productos al Text widget
+            for nombre, cantidad in inventario:
+                inventario_text.insert(tk.END, f"{nombre}: {cantidad}\n")
 
-    tk.Button(ventana_venta, text="Registrar Venta", command=registrar_venta_gui, bg='#4CAF50', fg='white', font=("Arial", 12), relief="raised", width=20).pack(pady=10)
+            inventario_text.config(state=tk.DISABLED)  # Deshabilitar la edición del Text widget
+
+    except Error as e:
+        messagebox.showerror("Error", f"Error al consultar el inventario: {e}")
+    finally:
+        if connection and connection.is_connected():
+            cursor.close()
+            connection.close()
 
 # Configuración de la ventana principal
 root = tk.Tk()
 root.title("Sistema de Punto de Venta")
+
+# Establecer la imagen de fondo
+background_image = PhotoImage(file="Fondo.png")
+background_label = tk.Label(root, image=background_image)
+background_label.place(x=0, y=0, relwidth=1, relheight=1)
 
 # Estilo
 root.configure(bg='#f0f8ff')
@@ -218,6 +313,7 @@ logo_label.pack(pady=10)
 tk.Button(root, text="Registrar Venta", command=abrir_registrar_venta, bg='#4CAF50', fg='white', font=("Arial", 12), relief="raised", width=20).pack(pady=10)
 tk.Button(root, text="Generar Corte X", command=generar_corte_x, bg='#2196F3', fg='white', font=("Arial", 12), relief="raised", width=20).pack(pady=10)
 tk.Button(root, text="Generar Corte Z", command=generar_corte_z, bg='#F44336', fg='white', font=("Arial", 12), relief="raised", width=20).pack(pady=10)
+tk.Button(root, text="Consultar Inventario", command=consultar_inventario, bg='#FFC107', fg='black', font=("Arial", 12), relief="raised", width=20).pack(pady=10)  # New button for inventory
 
 # Botón de salir
 tk.Button(root, text="Salir", command=root.quit, bg='#FF5733', fg='white', font=("Arial", 12), relief="raised", width=20).pack(pady=10)
