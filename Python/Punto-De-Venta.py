@@ -12,7 +12,7 @@ def conectar():
             host='localhost',
             database='punto_de_venta',
             user='root',
-            password='123456789'
+            password='Root'
         )
         if connection.is_connected():
             return connection
