@@ -19,6 +19,39 @@ def conectar():
     except Error as e:
         messagebox.showerror("Error", f"Error al conectar a la base de datos: {e}")
         return None
+    
+# Ventana para registrar ventas
+def abrir_registrar_venta():
+    ventana_venta = tk.Toplevel(root)
+    ventana_venta.title("Registrar Venta")
+    ventana_venta.configure(bg='#f0f8ff')
+
+    tk.Label(ventana_venta, text="ID del Cajero:", bg='#f0f8ff', font=("Arial", 12)).pack(pady=5)
+    id_usuario_entry = tk.Entry(ventana_venta, font=("Arial", 12), bd=2, relief="groove")
+    id_usuario_entry.pack(pady=5)
+
+    tk.Label(ventana_venta, text="ID del Cliente (dejar vacío si es cliente general):", bg='#f0f8ff', font=("Arial", 12)).pack(pady=5)
+    id_cliente_entry = tk.Entry(ventana_venta, font=("Arial", 12), bd=2, relief="groove")
+    id_cliente_entry.pack(pady=5)
+
+    productos_entry = tk.Text(ventana_venta, height=5, width=40, font=("Arial", 12), bd=2, relief="groove")
+    productos_entry.pack(pady=10)
+    tk.Label(ventana_venta, text="Ingrese los productos en el formato 'ID, Cantidad' por línea:", bg='#f0f8ff', font=("Arial", 12)).pack(pady=5)
+
+    def registrar_venta_gui():
+        id_usuario = id_usuario_entry.get()
+        id_cliente = id_cliente_entry.get() or None
+        productos = []
+        
+        for line in productos_entry.get("1.0", tk.END).strip().splitlines():
+            if line:
+                id_producto, cantidad = map(int, line.split(","))
+                productos.append((id_producto, cantidad))
+
+        registrar_venta(int(id_usuario), id_cliente, productos)
+        ventana_venta.destroy()
+
+    tk.Button(ventana_venta, text="Registrar Venta", command=registrar_venta_gui, bg='#4CAF50', fg='white', font=("Arial", 12), relief="raised", width=20).pack(pady=10)
 
 # Registrar una venta
 def registrar_venta(id_usuario, id_cliente, productos):
@@ -166,42 +199,50 @@ def generar_corte_z():
             cursor.close()
             connection.close()
 
-# Ventana para registrar ventas
-def abrir_registrar_venta():
-    ventana_venta = tk.Toplevel(root)
-    ventana_venta.title("Registrar Venta")
-    ventana_venta.configure(bg='#f0f8ff')
+# Consultar el inventario
+def consultar_inventario():
+    try:
+        connection = conectar()
+        if connection:
+            cursor = connection.cursor()
 
-    tk.Label(ventana_venta, text="ID del Cajero:", bg='#f0f8ff', font=("Arial", 12)).pack(pady=5)
-    id_usuario_entry = tk.Entry(ventana_venta, font=("Arial", 12), bd=2, relief="groove")
-    id_usuario_entry.pack(pady=5)
+            # Obtener todos los productos y sus cantidades en stock
+            cursor.execute("SELECT nombre, cantidad_en_stock FROM productos")
+            inventario = cursor.fetchall()
 
-    tk.Label(ventana_venta, text="ID del Cliente (dejar vacío si es cliente general):", bg='#f0f8ff', font=("Arial", 12)).pack(pady=5)
-    id_cliente_entry = tk.Entry(ventana_venta, font=("Arial", 12), bd=2, relief="groove")
-    id_cliente_entry.pack(pady=5)
+            # Crear una nueva ventana para mostrar el inventario
+            ventana_inventario = tk.Toplevel(root)
+            ventana_inventario.title("Consultar Inventario")
+            ventana_inventario.configure(bg='#f0f8ff')
 
-    productos_entry = tk.Text(ventana_venta, height=5, width=40, font=("Arial", 12), bd=2, relief="groove")
-    productos_entry.pack(pady=10)
-    tk.Label(ventana_venta, text="Ingrese los productos en el formato 'ID, Cantidad' por línea:", bg='#f0f8ff', font=("Arial", 12)).pack(pady=5)
+            # Crear una etiqueta para el título
+            tk.Label(ventana_inventario, text="Inventario Actual", font=("Arial", 16, "bold"), bg='#f0f8ff').pack(pady=10)
 
-    def registrar_venta_gui():
-        id_usuario = id_usuario_entry.get()
-        id_cliente = id_cliente_entry.get() or None
-        productos = []
-        
-        for line in productos_entry.get("1.0", tk.END).strip().splitlines():
-            if line:
-                id_producto, cantidad = map(int, line.split(","))
-                productos.append((id_producto, cantidad))
+            # Mostrar el inventario en un Text widget
+            inventario_text = tk.Text(ventana_inventario, height=15, width=50, font=("Arial", 12), bd=2, relief="groove")
+            inventario_text.pack(pady=10)
 
-        registrar_venta(int(id_usuario), id_cliente, productos)
-        ventana_venta.destroy()
+            # Agregar los productos al Text widget
+            for nombre, cantidad in inventario:
+                inventario_text.insert(tk.END, f"{nombre}: {cantidad}\n")
 
-    tk.Button(ventana_venta, text="Registrar Venta", command=registrar_venta_gui, bg='#4CAF50', fg='white', font=("Arial", 12), relief="raised", width=20).pack(pady=10)
+            inventario_text.config(state=tk.DISABLED)  # Deshabilitar la edición del Text widget
+
+    except Error as e:
+        messagebox.showerror("Error", f"Error al consultar el inventario: {e}")
+    finally:
+        if connection and connection.is_connected():
+            cursor.close()
+            connection.close()
 
 # Configuración de la ventana principal
 root = tk.Tk()
 root.title("Sistema de Punto de Venta")
+
+# Establecer la imagen de fondo
+background_image = PhotoImage(file="Fondo.png")
+background_label = tk.Label(root, image=background_image)
+background_label.place(x=0, y=0, relwidth=1, relheight=1)
 
 # Estilo
 root.configure(bg='#f0f8ff')
@@ -218,6 +259,7 @@ logo_label.pack(pady=10)
 tk.Button(root, text="Registrar Venta", command=abrir_registrar_venta, bg='#4CAF50', fg='white', font=("Arial", 12), relief="raised", width=20).pack(pady=10)
 tk.Button(root, text="Generar Corte X", command=generar_corte_x, bg='#2196F3', fg='white', font=("Arial", 12), relief="raised", width=20).pack(pady=10)
 tk.Button(root, text="Generar Corte Z", command=generar_corte_z, bg='#F44336', fg='white', font=("Arial", 12), relief="raised", width=20).pack(pady=10)
+tk.Button(root, text="Consultar Inventario", command=consultar_inventario, bg='#FFC107', fg='black', font=("Arial", 12), relief="raised", width=20).pack(pady=10)  # New button for inventory
 
 # Botón de salir
 tk.Button(root, text="Salir", command=root.quit, bg='#FF5733', fg='white', font=("Arial", 12), relief="raised", width=20).pack(pady=10)
