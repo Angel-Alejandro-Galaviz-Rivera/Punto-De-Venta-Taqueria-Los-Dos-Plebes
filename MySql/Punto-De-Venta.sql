@@ -113,3 +113,15 @@ INSERT INTO productos (nombre, descripcion, precio, cantidad_en_stock, categoria
 INSERT INTO usuarios (nombre, correo, contrasena, rol) VALUES
 ('Juan Pérez', 'juan.perez@example.com', 'contrasena123', 'cajero'),
 ('Ana García', 'ana.garcia@example.com', 'contrasena456', 'cajero');
+
+
+
+
+
+
+
+
+
+
+
+

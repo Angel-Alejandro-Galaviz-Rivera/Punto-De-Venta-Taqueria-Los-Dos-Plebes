@@ -22,12 +22,6 @@ def conectar():
     except Error as e:
         messagebox.showerror("Error", f"Error al conectar a la base de datos: {e}")
         return None
-import tkinter as tk
-from tkinter import messagebox
-from mysql.connector import Error
-import datetime
-from reportlab.pdfgen import canvas
-from reportlab.lib.pagesizes import letter
 
 # Ventana para registrar ventas
 def abrir_registrar_venta():
