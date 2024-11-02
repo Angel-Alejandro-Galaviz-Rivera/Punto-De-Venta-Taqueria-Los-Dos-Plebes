@@ -336,15 +336,15 @@ def abrir_caja():
 
 # Consultar el inventario
 def consultar_inventario():
-    def buscar_producto_por_sku():
-        sku = sku_entry.get()
+    def buscar_producto_por_codigo_barras():
+        codigo_barras = codigo_barras_entry.get()
         try:
             connection = conectar()
             if connection:
                 cursor = connection.cursor()
 
-                # Consultar producto por SKU
-                cursor.execute("SELECT nombre, cantidad_en_stock FROM productos WHERE sku = %s", (sku,))
+                # Consultar producto por código de barras
+                cursor.execute("SELECT nombre, cantidad_en_stock FROM productos WHERE codigo_barras = %s", (codigo_barras,))
                 producto = cursor.fetchone()
 
                 # Limpiar el Text widget antes de mostrar el resultado
@@ -383,13 +383,13 @@ def consultar_inventario():
             # Crear una etiqueta para el título
             tk.Label(ventana_inventario, text="Inventario Actual", font=("Arial", 16, "bold"), bg='#FF0000', fg='white').pack(pady=10)
 
-            # Crear un campo de entrada para SKU
-            tk.Label(ventana_inventario, text="Buscar por SKU:", font=("Arial", 12), bg='#FF0000', fg='white').pack(pady=5)
-            sku_entry = tk.Entry(ventana_inventario, font=("Arial", 12))
-            sku_entry.pack(pady=5)
+            # Crear un campo de entrada para el código de barras
+            tk.Label(ventana_inventario, text="Buscar por Código de Barras:", font=("Arial", 12), bg='#FF0000', fg='white').pack(pady=5)
+            codigo_barras_entry = tk.Entry(ventana_inventario, font=("Arial", 12))
+            codigo_barras_entry.pack(pady=5)
 
             # Botón para buscar el producto con color blanco y texto rojo
-            buscar_button = tk.Button(ventana_inventario, text="Buscar Producto", font=("Arial", 12), command=buscar_producto_por_sku, bg='white', fg='#FF0000')
+            buscar_button = tk.Button(ventana_inventario, text="Buscar Producto", font=("Arial", 12), command=buscar_producto_por_codigo_barras, bg='white', fg='#FF0000')
             buscar_button.pack(pady=10)
 
             # Mostrar el inventario en un Text widget
@@ -525,7 +525,7 @@ background_label.place(x=0, y=0, relwidth=1, relheight=1)
 
 # Estilo
 root.configure(bg='#f0f8ff')  # Color de fondo de la ventana principal
-header = tk.Label(root, text="Sistema de Punto de Venta", font=("Arial", 24, "bold"), bg='#FF0000', fg='white')  # Cambiar a rojo
+header = tk.Label(root, text="Taqueria los dos plebes", font=("Arial", 24, "bold"), bg='#FF0000', fg='white')  # Cambiar a rojo
 header.pack(pady=20)
 
 # Logo
@@ -535,17 +535,13 @@ logo_label = tk.Label(root, image=logo, bg='#f0f8ff')
 logo_label.pack(pady=10)
 
 # Botones de opciones 
+tk.Button(root, text="Abrir Caja", command=abrir_caja, bg='#FF0000', fg='white', font=("Arial", 12), relief="raised", width=20).pack(pady=10)  # Rojo
 tk.Button(root, text="Registrar Venta", command=abrir_registrar_venta, bg='#FF0000', fg='white', font=("Arial", 12), relief="raised", width=20).pack(pady=10)  # Rojo
-tk.Button(root, text="Generar Corte X", command=generar_corte_x, bg='#FF0000', fg='white', font=("Arial", 12), relief="raised", width=20).pack(pady=10)  # Rojo
-tk.Button(root, text="Generar Corte Z", command=confirmar_cierre_caja, bg='#FF0000', fg='white', font=("Arial", 12), relief="raised", width=20).pack(pady=10)  # Rojo
+tk.Button(root, text="Agregar Producto", command=agregar_producto, bg='#FF0000', fg='white', font=("Arial", 12), relief="raised", width=20).pack(pady=10)
 tk.Button(root, text="Consultar Inventario", command=consultar_inventario, bg='#FF0000', fg='white', font=("Arial", 12), relief="raised", width=20).pack(pady=10)  # Rojo
 tk.Button(root, text="Generar Reporte de Ventas", command=generar_reporte_ventas, bg='#FF0000', fg='white', font=("Arial", 12), relief="raised", width=20).pack(pady=10)  # Rojo
-tk.Button(root, text="Agregar Producto", command=agregar_producto, bg='#FF0000', fg='white', font=("Arial", 12), relief="raised", width=20).pack(pady=10)
-
-# Botón para abrir la caja
-tk.Button(root, text="Abrir Caja", command=abrir_caja, bg='#FF0000', fg='white', font=("Arial", 12), relief="raised", width=20).pack(pady=10)  # Rojo
-
-# Botón de salir
+tk.Button(root, text="Generar Corte X", command=generar_corte_x, bg='#FF0000', fg='white', font=("Arial", 12), relief="raised", width=20).pack(pady=10)  # Rojo
+tk.Button(root, text="Generar Corte Z", command=confirmar_cierre_caja, bg='#FF0000', fg='white', font=("Arial", 12), relief="raised", width=20).pack(pady=10)  # Rojo
 tk.Button(root, text="Salir", command=root.quit, bg='#FF0000', fg='white', font=("Arial", 12), relief="raised", width=20).pack(pady=10)  # Rojo
 
 # Iniciar la ventana principal
