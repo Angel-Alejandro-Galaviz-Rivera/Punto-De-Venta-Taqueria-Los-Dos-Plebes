@@ -77,20 +77,20 @@ CREATE TABLE cortes_z (
 
 -- Registros de productos
 INSERT INTO productos (nombre, descripcion, precio, cantidad_en_stock, categoria, codigo_barras) VALUES 
-('Taco de sirloin maíz', 'Taco de sirloin con tortilla maíz', 26, 23, 'tacos', '000001'),
-('Taco de sirloin harina', 'Taco de sirloin con tortilla de harina', 26, 15, 'tacos', '000002'),
-('Taco sirloin maíz con queso', 'Taco de sirloin con tortilla de maíz y queso', 32, 35, 'tacos', '000003'),
-('Taco de sirloin harina con queso', 'Taco de sirloin con tortilla de harina y queso', 32, 12, 'tacos', '000004'),
-('Quesadilla mixta de harina', 'Quesadilla con carne sirloin y trompo', 65, 9, 'quesadillas', '000005'),
-('Quesadilla Maíz', 'Tortilla grande con queso y carne', 65, 31, 'quesadillas', '000006'),
-('Vampiro', 'Tortilla tostada a las brasas con queso y carne', 50, 17, 'antojitos', '000007'),
-('Pellizcada', 'Sope con asientos de puerco, queso y carne', 70, 6, 'antojitos', '000008'),
-('Papa Asada especial', 'Con carne, acompañada de tortilla o galleta', 125, 25, 'papas', '000009'),
-('Papa sencilla', 'Sin carne, acompañada de tortilla o galleta', 80, 7, 'papas', '000010'),
-('Salchicha asada sencilla', 'Salchicha asada', 30, 19, 'salchichas', '000011'),
-('Salchicha asada especial', 'Con queso y carne', 45, 4, 'salchichas', '000012'),
-('Frijoles charros sencillos', 'Frijoles charros', 30, 33, 'frijoles', '000013'),
-('Frijoles charros especiales', NULL, 40, 8, 'frijoles', '000014'),
+('Taco de sirloin maíz', 'Taco de sirloin con tortilla maíz', 26, NULL, 'tacos', '000001'),
+('Taco de sirloin harina', 'Taco de sirloin con tortilla de harina', 26, NULL, 'tacos', '000002'),
+('Taco sirloin maíz con queso', 'Taco de sirloin con tortilla de maíz y queso', 32, NULL, 'tacos', '000003'),
+('Taco de sirloin harina con queso', 'Taco de sirloin con tortilla de harina y queso', 32, NULL, 'tacos', '000004'),
+('Quesadilla mixta de harina', 'Quesadilla con carne sirloin y trompo', 65, NULL, 'quesadillas', '000005'),
+('Quesadilla Maíz', 'Tortilla grande con queso y carne', 65, NULL, 'quesadillas', '000006'),
+('Vampiro', 'Tortilla tostada a las brasas con queso y carne', 50, NULL, 'antojitos', '000007'),
+('Pellizcada', 'Sope con asientos de puerco, queso y carne', 70, NULL, 'antojitos', '000008'),
+('Papa Asada especial', 'Con carne, acompañada de tortilla o galleta', 125, NULL, 'papas', '000009'),
+('Papa sencilla', 'Sin carne, acompañada de tortilla o galleta', 80, NULL, 'papas', '000010'),
+('Salchicha asada sencilla', 'Salchicha asada', 30, NULL, 'salchichas', '000011'),
+('Salchicha asada especial', 'Con queso y carne', 45, NULL, 'salchichas', '000012'),
+('Frijoles charros sencillos', 'Frijoles charros', 30, NULL, 'frijoles', '000013'),
+('Frijoles charros especiales', "Frijoles charros", 40, NULL, 'frijoles', '000014'),
 
 -- Bebidas de 1 litro
 ('Litro Horchata', NULL, 50, 20, 'bebidas', '000015'),
@@ -113,15 +113,3 @@ INSERT INTO productos (nombre, descripcion, precio, cantidad_en_stock, categoria
 INSERT INTO usuarios (nombre, correo, contrasena, rol) VALUES
 ('Juan Pérez', 'juan.perez@example.com', 'contrasena123', 'cajero'),
 ('Ana García', 'ana.garcia@example.com', 'contrasena456', 'cajero');
-
-
-
-
-
-
-
-
-
-
-
-
